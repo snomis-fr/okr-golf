@@ -1,471 +1,424 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Golf Performance - OKR 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        
-        :root {
-            --golf-green: #14362d;
-            --golf-accent: #2ecc71;
-            --bg-light: #f8f9fa;
-        }
+import React, { useState } from 'react';
+import { 
+  Trophy, 
+  Target, 
+  CheckCircle2, 
+  Clock, 
+  Calendar, 
+  LayoutDashboard, 
+  BarChart3, 
+  PlusCircle, 
+  ChevronRight,
+  AlertCircle,
+  Activity,
+  History,
+  TrendingUp,
+  MapPin,
+  Stethoscope,
+  Wind,
+  Zap,
+  Brain,
+  Moon
+} from 'lucide-react';
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: #1a1a1a;
-            -webkit-tap-highlight-color: transparent;
-        }
+const App = () => {
+  const [activeView, setActiveView] = useState('dashboard');
+  const [currentPlayer, setCurrentPlayer] = useState('Aymeric Laussot');
+  const [currentSeason, setCurrentSeason] = useState('2026');
+  
+  const players = [
+    "Aymeric Laussot", "Perrine Delacour", "Mathis Pansart", 
+    "Céline Boutier", "Victor Perez", "Matthieu Pavon", "Agathe Laisné"
+  ];
 
-        .safe-area-bottom {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+  const seasons = ["2025", "2026"];
 
-        .view {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
+  // Configuration des 5 piliers OKR basés sur votre liste
+  const okrData = {
+    "Aymeric Laussot": {
+      "2026": {
+        status: "Blessé",
+        nextTournament: { name: "Abu Dhabi Challenge", location: "Émirats Arabes Unis", date: "16-19 Avril" },
+        recentResults: [
+          { name: "German Challenge", result: "CUT", score: "85T (70-75)", date: "20 Juil 2025" },
+          { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
+        ],
+        staffNote: "Rééducation en cours. Focus sur le pilier 4 (Physique) et 5 (Mental) pendant l'indisponibilité pour préparer le retour à Abu Dhabi.",
+        categories: [
+          {
+            id: 1,
+            title: "Performance en Tournoi",
+            icon: Trophy,
+            color: "text-amber-600",
+            bg: "bg-amber-50",
+            krs: [
+              { label: "Victoires", target: 1, current: 0, unit: "" },
+              { label: "Top 10", target: 5, current: 0, unit: "", priority: true },
+              { label: "Cuts Passés", target: 13, current: 0, unit: "", priority: true }
+            ]
+          },
+          {
+            id: 2,
+            title: "Driving & Précision",
+            icon: Wind,
+            color: "text-blue-600",
+            bg: "bg-blue-50",
+            krs: [
+              { label: "Fairways touchés", target: 68, current: 0, unit: "%", priority: true },
+              { label: "Vitesse de balle", target: 172, current: 0, unit: " mph" },
+              { label: "Moyenne Distance", target: 295, current: 0, unit: "y" }
+            ]
+          },
+          {
+            id: 3,
+            title: "Scoring & Petit Jeu",
+            icon: Target,
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+            krs: [
+              { label: "Putts / Tour", target: 28.5, current: 0, unit: "", priority: true, isLowerBetter: true },
+              { label: "Putts par GIR", target: 1.75, current: 0, unit: "", isLowerBetter: true },
+              { label: "Scrambling", target: 65, current: 0, unit: "%" }
+            ]
+          },
+          {
+            id: 4,
+            title: "Physique & Récupération",
+            icon: Activity,
+            color: "text-rose-600",
+            bg: "bg-rose-50",
+            krs: [
+              { label: "HRV Moyen", target: 75, current: 62, unit: "ms", priority: true },
+              { label: "Mobilité (Yoga/Kiné)", target: 5, current: 0, unit: "/m" },
+              { label: "Sommeil (> 8h/n)" , target: 100, current: 0, unit: "%" }
+            ]
+          },
+          {
+            id: 5,
+            title: "Mental & Routines",
+            icon: Brain,
+            color: "text-purple-600",
+            bg: "bg-purple-50",
+            krs: [
+              { label: "Routine Pre-shot", target: 100, current: 0, unit: "%" },
+              { label: "Méditation", target: 5, current: 0, unit: "j/7" },
+              { label: "Focus Post-Round", target: 100, current: 0, unit: "%" }
+            ]
+          }
+        ]
+      },
+      "2025": {
+        status: "Terminé",
+        nextTournament: { name: "Saison Clôturée", location: "N/A", date: "N/A" },
+        recentResults: [
+          { name: "German Challenge", result: "CUT", score: "85T (70-75)", date: "20 Juil 2025" },
+          { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
+        ],
+        categories: [] // Simplifié pour l'exemple
+      }
+    }
+  };
 
-        .view.active {
-            display: block;
-        }
+  const currentData = okrData[currentPlayer]?.[currentSeason] || okrData["Aymeric Laussot"]["2026"];
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  // Extraction des KR prioritaires pour le dashboard
+  const priorityKRs = currentData.categories?.flatMap(cat => 
+    cat.krs.filter(kr => kr.priority).map(kr => ({ ...kr, catIcon: cat.icon, catColor: cat.color }))
+  ) || [];
 
-        .nav-item.active {
-            color: var(--golf-accent);
-        }
+  const NavItem = ({ id, icon: Icon, label, active, onClick }) => (
+    <button 
+      onClick={onClick}
+      className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-emerald-500 scale-110' : 'text-slate-400 hover:text-slate-600'}`}
+    >
+      <Icon size={22} />
+      <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
+    </button>
+  );
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .progress-bar {
-            height: 6px;
-            border-radius: 3px;
-            background: #eee;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            transition: width 0.5s ease;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
-
-        /* Custom dropdown arrow for golf style */
-        .custom-select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right center;
-            background-size: 12px;
-            padding-right: 16px;
-        }
-    </style>
-</head>
-<body class="pb-24">
-
-    <!-- Header Fixed -->
-    <header class="bg-[#14362d] text-white p-5 sticky top-0 z-50 flex items-center shadow-md">
-        <!-- Player Selector -->
-        <div class="flex-1">
-            <select id="player-select" onchange="updatePlayerContext(this.value)" class="custom-select bg-transparent border-none text-[10px] font-bold uppercase tracking-widest outline-none appearance-none cursor-pointer">
-                <option value="Aymeric Laussot" selected>A. Laussot</option>
-                <option value="Perrine Delacour">P. Delacour</option>
-                <option value="Mathis Pansart">M. Pansart</option>
-                <option value="Céline Boutier">C. Boutier</option>
-                <option value="Victor Perez">V. Perez</option>
-                <option value="Matthieu Pavon">M. Pavon</option>
-                <option value="Agathe Laisné">A. Laisné</option>
+  return (
+    <div className="min-h-screen bg-[#f8fafc] pb-28 font-sans text-slate-900">
+      {/* Header Premium */}
+      <header className="bg-[#14362d] text-white p-5 sticky top-0 z-50 flex items-center justify-between shadow-lg">
+        <div className="flex-1 flex flex-col">
+          <span className="text-[9px] font-black uppercase opacity-60 tracking-widest">Joueur</span>
+          <div className="flex items-center gap-2">
+            <select 
+              value={currentPlayer}
+              onChange={(e) => setCurrentPlayer(e.target.value)}
+              className="bg-transparent border-none text-[12px] font-bold uppercase tracking-tight outline-none cursor-pointer p-0"
+            >
+              {players.map(p => (
+                <option key={p} value={p} className="text-black">{p}</option>
+              ))}
             </select>
+            {currentData.status === "Blessé" && (
+              <span className="bg-rose-500 text-[8px] px-2 py-0.5 rounded-full font-black uppercase animate-pulse flex items-center gap-1">
+                <div className="w-1 h-1 bg-white rounded-full"></div> Blessé
+              </span>
+            )}
+          </div>
         </div>
         
-        <!-- Central Title -->
-        <div class="flex-1 text-center">
-            <h1 class="font-bold text-xl tracking-tighter">OKR</h1>
+        <div className="flex-1 text-center">
+          <h1 className="font-black text-xl tracking-tighter uppercase italic">STRATOS</h1>
         </div>
 
-        <!-- Season Stats -->
-        <div class="flex-1 text-right">
-            <span class="text-[10px] block opacity-70 uppercase font-bold">Saison 2026</span>
-            <span class="font-mono text-xs" id="season-progression">0%</span>
+        <div className="flex-1 text-right flex flex-col items-end">
+          <select 
+            value={currentSeason}
+            onChange={(e) => setCurrentSeason(e.target.value)}
+            className="bg-transparent border-none text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer p-0 text-right"
+          >
+            {seasons.map(s => (
+              <option key={s} value={s} className="text-black">Saison {s}</option>
+            ))}
+          </select>
+          <span className="font-mono text-[10px] opacity-70 font-bold uppercase tracking-widest mt-1">
+            {currentSeason === '2026' ? 'Récupération' : 'Archive'}
+          </span>
         </div>
-    </header>
+      </header>
 
-    <!-- Main Content Containers -->
-    <main class="p-4 space-y-6 max-w-md mx-auto">
+      <main className="p-4 max-w-6xl mx-auto">
         
-        <!-- 1. DASHBOARD -->
-        <section id="view-dashboard" class="view active">
-            <div class="card p-5 mb-4 border-l-4 border-amber-500">
-                <h3 class="text-xs font-bold uppercase text-gray-400 mb-2">Prochain Départ</h3>
-                <p class="text-xl font-bold">Ras Al Khaimah Champ.</p>
-                <p class="text-sm text-gray-500 italic">Émirats Arabes Unis • 22 Janv.</p>
-                <p id="dashboard-player-name" class="text-[10px] font-bold text-emerald-700 mt-2 uppercase tracking-widest border-t pt-2">Profil : Aymeric Laussot</p>
+        {/* VUE DASHBOARD (SYNTHÈSE DES PRIORITÉS) */}
+        {activeView === 'dashboard' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            
+            {/* COLONNE GAUCHE: PRIORITÉS OKR */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="flex justify-between items-center px-1">
+                <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
+                  <Zap size={14} className="text-amber-500 fill-amber-500" /> Objectifs Prioritaires
+                </h2>
+                <div className="h-px flex-1 bg-slate-200 ml-4"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {priorityKRs.map((kr, i) => (
+                  <div key={i} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className={`p-2 rounded-xl ${kr.catColor.replace('text', 'bg').replace('600', '50')}`}>
+                        <kr.catIcon size={18} className={kr.catColor} />
+                      </div>
+                      <span className="text-[10px] font-black text-slate-300 group-hover:text-emerald-500 transition-colors">PRIO</span>
+                    </div>
+                    <p className="font-bold text-sm text-slate-800 mb-1">{kr.label}</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-black tracking-tighter">
+                        {kr.current === 0 ? '--' : kr.current}{kr.unit}
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">Cible: {kr.target}{kr.unit}</p>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded-full mt-4 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-1000 ${kr.current > 0 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-slate-200'}`} 
+                        style={{ width: `${Math.min(100, kr.current === 0 ? 5 : (kr.isLowerBetter ? (kr.target / kr.current) * 100 : (kr.current / kr.target) * 100))}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Note Médicale / Staff */}
+              <div className="bg-[#14362d] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute right-[-20px] top-[-20px] opacity-10 group-hover:rotate-12 transition-transform duration-700">
+                  <Stethoscope size={120} />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle size={16} className="text-emerald-400" />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-emerald-300">Avis Médical & Staff</h3>
+                  </div>
+                  <p className="text-sm italic opacity-90 leading-relaxed font-medium">
+                    "{currentData.staffNote}"
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <h2 class="text-xs font-bold uppercase text-gray-500 mt-6 mb-3 tracking-wider">OKR Prioritaires (Saison)</h2>
-            <div class="space-y-3">
-                <!-- Top 10 -->
-                <div class="card p-4 flex items-center justify-between">
-                    <div>
-                        <p class="font-semibold text-sm">Top 10</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Objectif: 5</p>
+            {/* COLONNE DROITE: TOURNAMENT TIMELINE */}
+            <div className="lg:col-span-5 space-y-8">
+              
+              {/* Historique */}
+              <div className="space-y-4">
+                <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 px-1">
+                  <History size={14} className="text-slate-400" /> Derniers Résultats
+                </h2>
+                <div className="space-y-3">
+                  {currentData.recentResults.map((res, i) => (
+                    <div key={i} className="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-slate-100 group hover:border-emerald-200 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-10 rounded-xl bg-slate-900 flex flex-col items-center justify-center text-white font-black text-[10px]">
+                          <span>{res.result}</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">{res.name}</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase">{res.date}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[11px] font-black bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">{res.score}</span>
+                      </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">0/5</span>
-                        <div class="status-dot bg-gray-300"></div>
-                    </div>
+                  ))}
                 </div>
-                <!-- Cuts Passés -->
-                <div class="card p-4 flex items-center justify-between">
-                    <div>
-                        <p class="font-semibold text-sm">Cuts Passés</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Objectif: 13/13</p>
+              </div>
+
+              {/* Prochain Tournoi */}
+              <div className="space-y-4 pt-2">
+                <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 px-1">
+                  <TrendingUp size={14} className="text-amber-500" /> Objectif Retour
+                </h2>
+                <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl shadow-slate-200 border border-slate-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[5rem] -z-0"></div>
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-200">
+                        <Calendar size={24} className="text-white" />
+                      </div>
+                      <span className="bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-amber-200">
+                        {currentData.nextTournament.date}
+                      </span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">0/13</span>
-                        <div class="status-dot bg-gray-300"></div>
+
+                    <h3 className="text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Challenge Tour 2026</h3>
+                    <h4 className="text-2xl font-black text-slate-900 mb-1">{currentData.nextTournament.name}</h4>
+                    <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase">
+                      <MapPin size={12} /> {currentData.nextTournament.location}
                     </div>
+
+                    <div className="mt-10 pt-6 border-t border-slate-50 flex justify-between items-center">
+                      <div className="flex -space-x-2">
+                        {[1,2,3].map(n => (
+                          <div key={n} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">S{n}</div>
+                        ))}
+                      </div>
+                      <button className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-slate-300">
+                        Stratégie
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <!-- Fairways -->
-                <div class="card p-4 flex items-center justify-between">
-                    <div>
-                        <p class="font-semibold text-sm">% Fairways Touchés</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Objectif: 68%</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">-- %</span>
-                        <div class="status-dot bg-gray-300"></div>
-                    </div>
-                </div>
-                <!-- Putting -->
-                <div class="card p-4 flex items-center justify-between">
-                    <div>
-                        <p class="font-semibold text-sm">Moyenne Putts / Tour</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Objectif: < 28.5</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">--</span>
-                        <div class="status-dot bg-gray-300"></div>
-                    </div>
-                </div>
-                <!-- HRV -->
-                <div class="card p-4 flex items-center justify-between border-t border-red-50">
-                    <div>
-                        <p class="font-semibold text-sm text-red-900">Physiologie (HRV)</p>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Cible: > 75 ms</p>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold">72 ms</span>
-                        <div class="status-dot bg-amber-400"></div>
-                    </div>
-                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* VUE OKRS DÉTAILLÉE (LES 5 PILIERS) */}
+        {activeView === 'okrs' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-3xl mx-auto">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 text-center">
+              <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Plan de Montée DPWT</h2>
+              <p className="text-slate-500 text-sm mt-2 font-medium italic">Analyse détaillée des 5 piliers de performance d'Aymeric.</p>
             </div>
 
-            <div class="mt-6 card p-5 bg-[#14362d] text-white">
-                <h3 class="text-xs font-bold uppercase text-gray-400 mb-1">Dernière Note Staff</h3>
-                <p id="staff-note" class="text-sm italic opacity-90">"Focus sur la routine pre-shot au putting durant les reconnaissances."</p>
-            </div>
-        </section>
-
-        <!-- 2. OKRS LIST -->
-        <section id="view-okrs" class="view">
-            <div class="space-y-6">
-                
-                <!-- Objective 1: Performance -->
-                <div class="card overflow-hidden border-t-4 border-emerald-600">
-                    <div class="bg-gray-50 p-4 border-b">
-                        <h3 class="font-bold text-gray-800 text-sm uppercase">1. Performance en Tournoi</h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-[10px] font-bold uppercase text-gray-400"><span>Victoires</span><span>0/1</span></div>
-                                <div class="progress-bar"><div class="progress-fill bg-emerald-500" style="width: 0%"></div></div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-[10px] font-bold uppercase text-gray-400 text-emerald-700"><span>Top 10 (PRIO)</span><span>0/5</span></div>
-                                <div class="progress-bar"><div class="progress-fill bg-emerald-500" style="width: 0%"></div></div>
-                            </div>
-                            <div class="space-y-1 col-span-2">
-                                <div class="flex justify-between text-[10px] font-bold uppercase text-emerald-700"><span>Cuts Passés (PRIO)</span><span>0/13</span></div>
-                                <div class="progress-bar"><div class="progress-fill bg-emerald-500" style="width: 0%"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objective 2: Driving -->
-                <div class="card overflow-hidden border-t-4 border-blue-600">
-                    <div class="bg-gray-50 p-4 border-b">
-                        <h3 class="font-bold text-gray-800 text-sm uppercase">2. Driving & Précision</h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-bold text-blue-700"><span>KR: Fairways touchés (PRIO)</span><span>68%</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-blue-500" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Vitesse de balle (172 mph)</span><span>0</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-blue-200" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Moyenne Distance (+295y)</span><span>0y</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-blue-200" style="width: 0%"></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objective 3: Scoring -->
-                <div class="card overflow-hidden border-t-4 border-orange-600">
-                    <div class="bg-gray-50 p-4 border-b">
-                        <h3 class="font-bold text-gray-800 text-sm uppercase">3. Scoring & Petit Jeu</h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-bold text-orange-700"><span>KR: Putts / Tour (PRIO)</span><span>< 28.5</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-orange-500" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Putts par GIR (< 1.75)</span><span>0</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-orange-200" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Scrambling (65%)</span><span>0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-orange-200" style="width: 0%"></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objective 4: Physique -->
-                <div class="card overflow-hidden border-t-4 border-red-600">
-                    <div class="bg-gray-50 p-4 border-b">
-                        <h3 class="font-bold text-gray-800 text-sm uppercase">4. Physique & Récupération</h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-bold text-red-700"><span>KR: HRV Moyen (PRIO)</span><span>> 75ms</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-red-500" style="width: 72%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Mobilité (Yoga/Kiné) - 5/m</span><span>0/5</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-red-200" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Sommeil (> 8h/nuit)</span><span>0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-red-200" style="width: 0%"></div></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objective 5: Mental -->
-                <div class="card overflow-hidden border-t-4 border-purple-600">
-                    <div class="bg-gray-50 p-4 border-b">
-                        <h3 class="font-bold text-gray-800 text-sm uppercase">5. Mental & Routines</h3>
-                    </div>
-                    <div class="p-4 space-y-4">
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Respect Routine Pre-shot</span><span>0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-purple-500" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Méditation (5j/7)</span><span>0/5</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-purple-500" style="width: 0%"></div></div>
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-xs font-medium"><span>KR: Focus Post-Round</span><span>0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill bg-purple-500" style="width: 0%"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. CHECK-IN FORM -->
-        <section id="view-checkin" class="view">
-            <form id="checkin-form" class="space-y-6">
-                <div class="card p-5 space-y-4">
-                    <p class="text-[10px] font-bold uppercase text-gray-400 tracking-widest text-center border-b pb-2">Nouveau Relevé</p>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Joueur Concerné</label>
-                        <input type="text" id="checkin-player-display" class="w-full p-3 bg-gray-100 border rounded-lg outline-none text-sm font-bold text-gray-500" disabled>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Putt Moyen (dernier tour)</label>
-                        <input type="number" step="0.1" class="w-full p-3 bg-gray-50 border rounded-lg outline-none" placeholder="ex: 28.2">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Fairways (%)</label>
-                        <input type="number" class="w-full p-3 bg-gray-50 border rounded-lg outline-none" placeholder="ex: 65">
-                    </div>
-                    <button type="submit" class="w-full py-4 bg-[#14362d] text-white rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg mt-4">
-                        Enregistrer
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- 4. CALENDAR -->
-        <section id="view-calendar" class="view">
-            <h2 class="text-xs font-bold uppercase text-gray-500 mb-3 px-1">Circuit DP World Tour 2026</h2>
-            <div class="space-y-3 mb-6 max-h-[65vh] overflow-y-auto pr-1 custom-scroll">
-                
-                <div class="card p-4 flex gap-4 border-l-4 border-amber-500 shadow-sm">
-                    <div class="text-center bg-[#14362d] text-white rounded-lg px-3 py-2 h-fit min-w-[65px]">
-                        <span class="block text-[10px] font-bold uppercase">Jan</span>
-                        <span class="text-lg font-bold">22</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-sm">Ras Al Khaimah Champ.</p>
-                        <p class="text-[10px] text-gray-500 font-medium italic">Émirats Arabes Unis</p>
-                    </div>
-                </div>
-
-                <div class="card p-4 flex gap-4 border-l-4 border-gray-300">
-                    <div class="text-center bg-gray-100 rounded-lg px-3 py-2 h-fit min-w-[65px]">
-                        <span class="block text-[10px] font-bold uppercase">Fév</span>
-                        <span class="text-lg font-bold">05</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-sm text-gray-700">Singapore Classic</p>
-                        <p class="text-[10px] text-gray-400 font-medium italic">Singapour</p>
-                    </div>
-                </div>
-
-                <div class="card p-4 flex gap-4 border-l-4 border-emerald-600">
-                    <div class="text-center bg-emerald-600 text-white rounded-lg px-3 py-2 h-fit min-w-[65px]">
-                        <span class="block text-[10px] font-bold uppercase">Jui</span>
-                        <span class="text-lg font-bold">11</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-sm text-emerald-800">Open de France</p>
-                        <p class="text-[10px] text-emerald-600 font-medium italic">France</p>
-                    </div>
+            {currentData.categories?.map((cat) => (
+              <div key={cat.id} className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div className={`p-5 flex items-center gap-4 ${cat.bg} border-b border-slate-50`}>
+                  <div className={`p-2.5 rounded-xl bg-white shadow-sm`}>
+                    <cat.icon size={22} className={cat.color} />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider">{cat.title}</h3>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Objectifs Saison 2026</p>
+                  </div>
                 </div>
                 
-                <div class="p-4 text-center text-xs text-gray-400 italic">... et 10 autres tournois prévus</div>
+                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {cat.krs.map((kr, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <span className="text-[11px] font-bold text-slate-500 leading-tight flex items-center gap-1">
+                          {kr.label}
+                          {kr.priority && <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>}
+                        </span>
+                        <span className="text-xs font-black text-slate-800 italic">{kr.current === 0 ? '--' : kr.current}{kr.unit}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-700 ${cat.color.replace('text', 'bg')}`}
+                          style={{ width: `${kr.current === 0 ? 0 : Math.min(100, (kr.isLowerBetter ? (kr.target / kr.current) * 100 : (kr.current / kr.target) * 100))}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Cible: {kr.target}{kr.unit}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* CALENDAR VIEW */}
+        {activeView === 'calendar' && (
+          <div className="max-w-md mx-auto space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h2 className="text-xs font-black uppercase text-slate-500 mb-4 px-1 tracking-[0.2em]">Agenda de Reprise</h2>
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 text-center">
+              <Calendar className="mx-auto text-emerald-100 mb-6" size={60} />
+              <p className="text-sm text-slate-600 font-bold leading-relaxed">
+                Reprise officielle prévue dans <span className="text-emerald-600">-- jours</span> à Abu Dhabi.
+              </p>
+              <div className="mt-8 space-y-3">
+                <div className="p-4 bg-slate-50 rounded-2xl text-left border border-slate-100">
+                  <p className="text-[10px] font-black text-slate-400 uppercase">Mars 2026</p>
+                  <p className="text-sm font-bold text-slate-800">Tests physiques de charge (Swing)</p>
+                </div>
+                <div className="p-4 bg-emerald-50 rounded-2xl text-left border border-emerald-100">
+                  <p className="text-[10px] font-black text-emerald-600 uppercase">16 Avril 2026</p>
+                  <p className="text-sm font-bold text-emerald-900 italic underline decoration-2">Abu Dhabi Challenge</p>
+                </div>
+              </div>
             </div>
-        </section>
+          </div>
+        )}
 
-        <!-- 5. STATS -->
-        <section id="view-stats" class="view">
-            <div class="card p-5 text-center">
-                <p class="text-sm font-bold text-gray-500 uppercase">Analytiques 2026</p>
-                <p class="text-xs text-gray-400 mt-2 italic">Données en attente pour le profil actif.</p>
-            </div>
-        </section>
+        {/* STATS PLACEHOLDER */}
+        {activeView === 'stats' && (
+          <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500 text-center py-20">
+            <BarChart3 size={48} className="mx-auto text-slate-200 mb-4" />
+            <h3 className="font-black text-xl text-slate-800 uppercase tracking-tighter">Analyse de Données</h3>
+            <p className="text-slate-400 max-w-sm mx-auto text-sm font-medium">Les graphiques de performance seront générés après les premières cartes de scores enregistrées à Abu Dhabi.</p>
+          </div>
+        )}
 
-    </main>
+      </main>
 
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-20 safe-area-bottom z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <button onclick="switchView('dashboard', 'Dashboard')" class="nav-item active flex flex-col items-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span class="text-[10px] font-bold mt-1 uppercase">Dash</span>
-        </button>
-        <button onclick="switchView('okrs', 'Mes OKR')" class="nav-item flex flex-col items-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span id="nav-okr-label" class="text-[10px] font-bold mt-1 uppercase">A. Laussot</span>
-        </button>
-        <button onclick="switchView('checkin', 'Check-In')" class="nav-item flex flex-col items-center">
-            <div class="bg-[#14362d] text-white p-3 rounded-full -mt-10 shadow-lg border-4 border-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            </div>
-            <span class="text-[10px] font-bold mt-1 uppercase">Log</span>
-        </button>
-        <button onclick="switchView('calendar', 'Calendrier')" class="nav-item flex flex-col items-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span class="text-[10px] font-bold mt-1 uppercase">Cal</span>
-        </button>
-        <button onclick="switchView('stats', 'Analytiques')" class="nav-item flex flex-col items-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-            <span class="text-[10px] font-bold mt-1 uppercase">Stats</span>
-        </button>
-    </nav>
-
-    <script>
-        // Current player state
-        let currentPlayer = "Aymeric Laussot";
-
-        function updatePlayerContext(playerName) {
-            currentPlayer = playerName;
-            
-            // Update Dashboard display
-            document.getElementById('dashboard-player-name').innerText = "Profil : " + playerName;
-            
-            // Update Navigation label (shortened if necessary)
-            const navLabel = playerName.split(' ').map((n, i) => i === 0 ? n[0] + '.' : n).join(' ');
-            document.getElementById('nav-okr-label').innerText = navLabel;
-            
-            // Update Check-in form
-            document.getElementById('checkin-player-display').value = playerName;
-
-            // Reset dashboard stats look (optional)
-            console.log("Context switched to: " + playerName);
-        }
-
-        function switchView(viewId, title) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            // On navigation, if it's the OKR view, we show the player name in the header title potentially
-            // but the header central title is now fixed to "OKR"
-            
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            if (event) event.currentTarget.classList.add('active');
-            
-            // Prepare check-in display
-            if (viewId === 'checkin') {
-                document.getElementById('checkin-player-display').value = currentPlayer;
-            }
-
-            window.scrollTo(0, 0);
-        }
-
-        function toggleBtn(btn) {
-            const btns = btn.parentElement.querySelectorAll('button');
-            btns.forEach(b => { b.classList.remove('bg-gray-900', 'text-white'); b.classList.add('bg-white', 'text-gray-900'); });
-            btn.classList.add('bg-gray-900', 'text-white');
-            btn.classList.remove('bg-white');
-        }
+      {/* Barre de navigation fixe (Style Mobile-First Premium) */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around items-center h-24 pb-8 px-6 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
+        <NavItem 
+          id="dashboard" icon={LayoutDashboard} label="Dash" 
+          active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} 
+        />
+        <NavItem 
+          id="okrs" icon={Target} label="OKR" 
+          active={activeView === 'okrs'} onClick={() => setActiveView('okrs')} 
+        />
         
-        document.getElementById('checkin-form').onsubmit = (e) => {
-            e.preventDefault();
-            alert("Données pour " + currentPlayer + " synchronisées.");
-            switchView('dashboard', 'Dashboard');
-        };
+        {/* Bouton d'action central (Check-in) */}
+        <div className="relative">
+          <div className="absolute -inset-4 bg-emerald-500/20 rounded-full blur-2xl animate-pulse"></div>
+          <button 
+            onClick={() => setActiveView('checkin')}
+            className="bg-[#14362d] text-white p-4 rounded-[1.5rem] -mt-14 shadow-2xl shadow-emerald-950/40 border-4 border-white active:scale-90 transition-all"
+          >
+            <PlusCircle size={24} />
+          </button>
+        </div>
 
-        // Initialize display
-        window.onload = () => {
-            updatePlayerContext("Aymeric Laussot");
-        };
-    </script>
-</body>
-</html>
+        <NavItem 
+          id="calendar" icon={Calendar} label="Cal" 
+          active={activeView === 'calendar'} onClick={() => setActiveView('calendar')} 
+        />
+        <NavItem 
+          id="stats" icon={BarChart3} label="Stats" 
+          active={activeView === 'stats'} onClick={() => setActiveView('stats')} 
+        />
+      </nav>
+    </div>
+  );
+};
+
+export default App;

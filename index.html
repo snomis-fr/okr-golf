@@ -15,23 +15,22 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .animate-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-[#f8fafc]">
+<body class="bg-[#f1f5f9]">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Configuration simplifiée des icônes pour le navigateur
         const Icon = ({ name, size = 20, className = "" }) => {
             useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
+                if (window.lucide) { window.lucide.createIcons(); }
             }, [name]);
             return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
         };
@@ -41,74 +40,84 @@
             const [currentPlayer, setCurrentPlayer] = useState('Aymeric Laussot');
             const [currentSeason, setCurrentSeason] = useState('2026');
             
+            const [selectedTours, setSelectedTours] = useState({
+                "Aymeric Laussot": { "2026": ["abu-dhabi-26"] }
+            });
+
             const players = ["Aymeric Laussot", "Perrine Delacour", "Mathis Pansart", "Céline Boutier", "Victor Perez", "Matthieu Pavon", "Agathe Laisné"];
             const seasons = ["2025", "2026"];
+
+            const challengeTour2026 = [
+                { id: "sdc-26", date: "29-01", month: "JAN", title: "SDC Open", loc: "Afrique du Sud", r2m: 2000 },
+                { id: "cape-26", date: "05-08", month: "FÉV", title: "Cape Town Open", loc: "Afrique du Sud", r2m: 2000 },
+                { id: "ntt-26", date: "12-15", month: "FÉV", title: "NTT DATA Pro-Am", loc: "Afrique du Sud", r2m: 2000 },
+                { id: "jonsson-26", date: "19-22", month: "FÉV", title: "Jonsson Workwear Open", loc: "Afrique du Sud", r2m: 2000 },
+                { id: "abu-dhabi-26", date: "16-19", month: "AVR", title: "Abu Dhabi Challenge", loc: "UAE", r2m: 2000, current: true },
+                { id: "rak-26", date: "23-26", month: "AVR", title: "RAKBANK UAE Challenge", loc: "UAE", r2m: 2000 },
+                { id: "italy-26", date: "07-10", month: "MAI", title: "Italian Challenge Open", loc: "Italie", r2m: 2000 },
+                { id: "catalunya-26", date: "14-17", month: "MAI", title: "Challenge de Catalunya", loc: "Espagne", r2m: 2000 },
+                { id: "denmark-26", date: "21-24", month: "MAI", title: "Danish Golf Challenge", loc: "Danemark", r2m: 2000 },
+                { id: "espana-26", date: "28-31", month: "MAI", title: "Challenge de España", loc: "Espagne", r2m: 2000 },
+                { id: "swiss-26", date: "04-07", month: "JUIN", title: "Swiss Challenge", loc: "Suisse", r2m: 2000 },
+                { id: "austria-26", date: "11-14", month: "JUIN", title: "Interwetten Open", loc: "Autriche", r2m: 2000 },
+                { id: "england-26", date: "18-21", month: "JUIN", title: "England Golf Challenge", loc: "Angleterre", r2m: 2000 },
+                { id: "bretagne-26", date: "25-28", month: "JUIN", title: "Blot Open de Bretagne", loc: "France", r2m: 2000 },
+                { id: "vaudreuil-26", date: "02-05", month: "JUIL", title: "Le Vaudreuil Challenge", loc: "France", r2m: 2000 },
+                { id: "german-26", date: "09-12", month: "JUIL", title: "German Challenge", loc: "Allemagne", r2m: 2000 },
+                { id: "czech-26", date: "23-26", month: "JUIL", title: "Raiffeisenbank Challenge", loc: "Rép. Tchèque", r2m: 2000 },
+                { id: "estonia-26", date: "30-02", month: "AOÛT", title: "Estonian Challenge", loc: "Estonie", r2m: 2000 },
+                { id: "scottish-26", date: "06-09", month: "AOÛT", title: "Scottish Challenge", loc: "Écosse", r2m: 2000 },
+                { id: "irish-26", date: "13-16", month: "AOÛT", title: "Irish Challenge", loc: "Irlande", r2m: 2000 },
+                { id: "finnish-26", date: "20-23", month: "AOÛT", title: "Vierumäki Finnish Challenge", loc: "Finlande", r2m: 2000 },
+                { id: "dormy-26", date: "27-30", month: "AOÛT", title: "Dormy Open", loc: "Suède", r2m: 2000 },
+                { id: "rosa-26", date: "03-06", month: "SEPT", title: "Rosa Challenge Tour", loc: "Pologne", r2m: 2000 },
+                { id: "english-26", date: "10-13", month: "SEPT", title: "English Challenge", loc: "Angleterre", r2m: 2000 },
+                { id: "portugal-26", date: "17-20", month: "SEPT", title: "Open de Portugal", loc: "Portugal", r2m: 2000 },
+                { id: "hainan-26", date: "08-11", month: "OCT", title: "Hainan Open", loc: "Chine", r2m: 2000 },
+                { id: "hangzhou-26", date: "15-18", month: "OCT", title: "Hangzhou Open", loc: "Chine", r2m: 2000 },
+                { id: "final-26", date: "29-01", month: "NOV", title: "Rolex Grand Final", loc: "Espagne", r2m: 2000, major: true }
+            ];
 
             const okrData = {
                 "Aymeric Laussot": {
                     "2026": {
                         status: "Blessé",
-                        nextTournament: { name: "Abu Dhabi Challenge", location: "Émirats Arabes Unis", date: "16-19 Avril" },
+                        nextTournament: { name: "Abu Dhabi Challenge", location: "UAE", date: "16-19 Avril" },
                         recentResults: [
                             { name: "German Challenge", result: "CUT", score: "85T (70-75)", date: "20 Juil 2025" },
                             { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
                         ],
-                        staffNote: "Rééducation en cours. Focus sur le pilier 4 (Physique) et 5 (Mental) pendant l'indisponibilité pour préparer le retour à Abu Dhabi.",
+                        staffNote: "Rééducation en cours. Focus sur le pilier 4 (Physique) et 5 (Mental) pendant l'indisponibilité.",
                         categories: [
-                            {
-                                id: 1,
-                                title: "Performance en Tournoi",
-                                iconName: "trophy",
-                                color: "text-amber-600",
-                                bg: "bg-amber-50",
+                            { id: 1, title: "1. Performance en Tournoi", iconName: "trophy", color: "text-amber-600", bg: "bg-amber-100",
                                 krs: [
                                     { label: "Victoires", target: 1, current: 0, unit: "" },
                                     { label: "Top 10", target: 5, current: 0, unit: "", priority: true },
-                                    { label: "Cuts Passés", target: 13, current: 0, unit: "", priority: true }
+                                    { label: "Cuts Passés", target: 70, current: 0, unit: "%", priority: true }
                                 ]
                             },
-                            {
-                                id: 2,
-                                title: "Driving & Précision",
-                                iconName: "wind",
-                                color: "text-blue-600",
-                                bg: "bg-blue-50",
+                            { id: 2, title: "2. Driving & Précision", iconName: "wind", color: "text-blue-600", bg: "bg-blue-100",
                                 krs: [
                                     { label: "Fairways touchés", target: 68, current: 0, unit: "%", priority: true },
                                     { label: "Vitesse de balle", target: 172, current: 0, unit: " mph" },
                                     { label: "Moyenne Distance", target: 295, current: 0, unit: "y" }
                                 ]
                             },
-                            {
-                                id: 3,
-                                title: "Scoring & Petit Jeu",
-                                iconName: "target",
-                                color: "text-emerald-600",
-                                bg: "bg-emerald-50",
+                            { id: 3, title: "3. Scoring & Petit Jeu", iconName: "target", color: "text-emerald-600", bg: "bg-emerald-100",
                                 krs: [
                                     { label: "Putts / Tour", target: 28.5, current: 0, unit: "", priority: true, isLowerBetter: true },
                                     { label: "Putts par GIR", target: 1.75, current: 0, unit: "", isLowerBetter: true },
                                     { label: "Scrambling", target: 65, current: 0, unit: "%" }
                                 ]
                             },
-                            {
-                                id: 4,
-                                title: "Physique & Récupération",
-                                iconName: "activity",
-                                color: "text-rose-600",
-                                bg: "bg-rose-50",
+                            { id: 4, title: "4. Physique & Récupération", iconName: "activity", color: "text-rose-600", bg: "bg-rose-100",
                                 krs: [
                                     { label: "HRV Moyen", target: 75, current: 62, unit: "ms", priority: true },
                                     { label: "Mobilité (Yoga/Kiné)", target: 5, current: 0, unit: "/m" },
                                     { label: "Sommeil (> 8h/n)" , target: 100, current: 0, unit: "%" }
                                 ]
                             },
-                            {
-                                id: 5,
-                                title: "Mental & Routines",
-                                iconName: "brain",
-                                color: "text-purple-600",
-                                bg: "bg-purple-50",
+                            { id: 5, title: "5. Mental & Routines", iconName: "brain", color: "text-purple-600", bg: "bg-purple-100",
                                 krs: [
                                     { label: "Routine Pre-shot", target: 100, current: 0, unit: "%" },
                                     { label: "Méditation", target: 5, current: 0, unit: "j/7" },
@@ -116,15 +125,6 @@
                                 ]
                             }
                         ]
-                    },
-                    "2025": {
-                        status: "Terminé",
-                        nextTournament: { name: "Saison Clôturée", location: "N/A", date: "N/A" },
-                        recentResults: [
-                            { name: "German Challenge", result: "CUT", score: "85T (70-75)", date: "20 Juil 2025" },
-                            { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
-                        ],
-                        categories: []
                     }
                 }
             };
@@ -134,173 +134,166 @@
                 cat.krs.filter(kr => kr.priority).map(kr => ({ ...kr, catIcon: cat.iconName, catColor: cat.color }))
             ) || [];
 
+            const toggleTournament = (id) => {
+                setSelectedTours(prev => {
+                    const playerSzn = prev[currentPlayer]?.[currentSeason] || [];
+                    const newSelection = playerSzn.includes(id) ? playerSzn.filter(tid => tid !== id) : [...playerSzn, id];
+                    return { ...prev, [currentPlayer]: { ...(prev[currentPlayer] || {}), [currentSeason]: newSelection } };
+                });
+            };
+
             const NavItem = ({ id, iconName, label, active, onClick }) => (
-                <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-emerald-500 scale-110' : 'text-slate-400 hover:text-slate-600'}`}>
-                    <Icon name={iconName} size={22} />
-                    <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
+                <button onClick={onClick} className={`flex flex-col items-center gap-1 transition-all ${active ? 'text-emerald-600 scale-105 font-black' : 'text-slate-400 font-medium'}`}>
+                    <Icon name={iconName} size={24} />
+                    <span className="text-[10px] uppercase tracking-tighter">{label}</span>
                 </button>
             );
 
             return (
-                <div className="min-h-screen pb-28">
-                    {/* Header */}
-                    <header className="bg-[#14362d] text-white p-5 sticky top-0 z-50 flex items-center justify-between shadow-lg">
-                        <div className="flex-1 flex flex-col">
-                            <span className="text-[9px] font-black uppercase opacity-60 tracking-widest">Joueur</span>
-                            <div className="flex items-center gap-2">
-                                <select value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)} className="bg-transparent border-none text-[12px] font-bold uppercase tracking-tight outline-none cursor-pointer p-0">
+                <div className="min-h-screen pb-32">
+                    {/* Header Fixed */}
+                    <header className="bg-[#14362d] text-white p-4 sticky top-0 z-50 shadow-xl">
+                        <div className="max-w-6xl mx-auto flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">Joueur</span>
+                                <select value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)} className="bg-transparent border-none text-[12px] font-bold uppercase outline-none p-0 cursor-pointer">
                                     {players.map(p => <option key={p} value={p} className="text-black">{p}</option>)}
                                 </select>
-                                {currentData.status === "Blessé" && (
-                                    <span className="bg-rose-500 text-[8px] px-2 py-0.5 rounded-full font-black uppercase animate-pulse flex items-center gap-1">
-                                        <div className="w-1 h-1 bg-white rounded-full"></div> Blessé
-                                    </span>
-                                )}
                             </div>
-                        </div>
-                        <div className="flex-1 text-center">
-                            <h1 className="font-black text-lg sm:text-xl tracking-tighter uppercase italic leading-tight">Objectives & Key Results</h1>
-                        </div>
-                        <div className="flex-1 text-right flex flex-col items-end">
-                            <select value={currentSeason} onChange={(e) => setCurrentSeason(e.target.value)} className="bg-transparent border-none text-[10px] font-bold uppercase tracking-widest outline-none cursor-pointer p-0 text-right">
-                                {seasons.map(s => <option key={s} value={s} className="text-black">Saison {s}</option>)}
-                            </select>
-                            <span className="font-mono text-[10px] opacity-70 font-bold uppercase tracking-widest mt-1">{currentSeason === '2026' ? 'Récupération' : 'Archive'}</span>
+                            <h1 className="font-black text-sm uppercase italic tracking-tighter text-center leading-none px-2">Objectives & Key Results</h1>
+                            <div className="text-right">
+                                <select value={currentSeason} onChange={(e) => setCurrentSeason(e.target.value)} className="bg-transparent border-none text-[10px] font-bold uppercase outline-none p-0 text-right cursor-pointer">
+                                    {seasons.map(s => <option key={s} value={s} className="text-black">S{s}</option>)}
+                                </select>
+                                <div className="text-[8px] font-black uppercase text-emerald-400 mt-1">{currentSeason === '2026' ? 'Actif' : 'Archivé'}</div>
+                            </div>
                         </div>
                     </header>
 
                     <main className="p-4 max-w-6xl mx-auto">
+                        {/* DASHBOARD VIEW */}
                         {activeView === 'dashboard' && (
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in">
-                                {/* OKR Priorities */}
-                                <div className="lg:col-span-7 space-y-6">
-                                    <div className="flex justify-between items-center px-1">
-                                        <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
-                                            <Icon name="zap" size={14} className="text-amber-500" /> Objectifs Prioritaires
-                                        </h2>
-                                        <div className="h-px flex-1 bg-slate-200 ml-4"></div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {priorityKRs.map((kr, i) => (
-                                            <div key={i} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-all group">
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <div className={`p-2 rounded-xl ${kr.catColor.replace('text', 'bg').replace('600', '50')}`}>
-                                                        <Icon name={kr.catIcon} size={18} className={kr.catColor} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black text-slate-300 group-hover:text-emerald-500">PRIO</span>
-                                                </div>
-                                                <p className="font-bold text-sm text-slate-800 mb-1">{kr.label}</p>
-                                                <div className="flex items-end justify-between">
-                                                    <p className="text-2xl font-black tracking-tighter">{kr.current === 0 ? '--' : kr.current}{kr.unit}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Cible: {kr.target}{kr.unit}</p>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-slate-100 rounded-full mt-4 overflow-hidden">
-                                                    <div className={`h-full rounded-full transition-all duration-1000 ${kr.current > 0 ? 'bg-emerald-500' : 'bg-slate-200'}`} 
-                                                         style={{ width: `${Math.min(100, kr.current === 0 ? 5 : (kr.isLowerBetter ? (kr.target / kr.current) * 100 : (kr.current / kr.target) * 100))}%` }}></div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {/* Note Staff */}
-                                    <div className="bg-[#14362d] p-6 rounded-[2rem] text-white shadow-xl relative overflow-hidden group">
-                                        <div className="relative z-10">
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <Icon name="alert-circle" size={16} className="text-emerald-400" />
-                                                <h3 className="text-xs font-black uppercase tracking-widest text-emerald-300">Avis Médical & Staff</h3>
-                                            </div>
-                                            <p className="text-sm italic opacity-90 leading-relaxed font-medium">"{currentData.staffNote}"</p>
+                            <div className="space-y-6 animate-in">
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                    <div className="lg:col-span-7 space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest">Priorités</h2>
+                                            <div className="flex-1 h-px bg-slate-200"></div>
                                         </div>
-                                    </div>
-                                </div>
-
-                                {/* Timeline */}
-                                <div className="lg:col-span-5 space-y-8">
-                                    <div className="space-y-4">
-                                        <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 px-1">
-                                            <Icon name="history" size={14} className="text-slate-400" /> Derniers Résultats
-                                        </h2>
-                                        <div className="space-y-3">
-                                            {currentData.recentResults.map((res, i) => (
-                                                <div key={i} className="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-slate-100 group hover:border-emerald-200 transition-all">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-10 rounded-xl bg-slate-900 flex flex-col items-center justify-center text-white font-black text-[10px]">
-                                                            <span>{res.result}</span>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {priorityKRs.map((kr, i) => (
+                                                <div key={i} className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className={`p-1.5 rounded-lg ${kr.catColor.replace('text', 'bg').replace('600', '100')}`}>
+                                                            <Icon name={kr.catIcon} size={14} className={kr.catColor} />
                                                         </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-slate-800">{res.name}</p>
-                                                            <p className="text-[10px] text-slate-400 font-bold uppercase">{res.date}</p>
-                                                        </div>
+                                                        <span className="text-[8px] font-black bg-slate-100 px-1.5 py-0.5 rounded uppercase">Prio</span>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <span className="text-[11px] font-black bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">{res.score}</span>
+                                                    <p className="text-[10px] font-bold text-slate-800 truncate mb-1">{kr.label}</p>
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-xl font-black">{kr.current === 0 ? '--' : kr.current}{kr.unit}</span>
+                                                        <span className="text-[10px] text-slate-400 font-bold uppercase">/ {kr.target}{kr.unit}</span>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
+                                        <div className="bg-[#14362d] p-5 rounded-3xl text-white shadow-lg border border-emerald-900/20">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Icon name="alert-circle" size={14} className="text-emerald-400" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300">Note du Staff</span>
+                                            </div>
+                                            <p className="text-xs italic font-medium opacity-90 leading-relaxed">"{currentData.staffNote}"</p>
+                                        </div>
                                     </div>
 
-                                    <div className="space-y-4 pt-2">
-                                        <h2 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2 px-1">
-                                            <Icon name="trending-up" size={14} className="text-amber-500" /> Objectif Retour
-                                        </h2>
-                                        <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-slate-100 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[5rem] -z-0"></div>
+                                    <div className="lg:col-span-5 space-y-6">
+                                        <div className="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-200 relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-[4rem] -z-0"></div>
                                             <div className="relative z-10">
-                                                <div className="flex justify-between items-start mb-8">
-                                                    <div className="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-200 text-white">
-                                                        <Icon name="calendar" size={24} />
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="bg-emerald-600 p-3 rounded-2xl text-white shadow-lg">
+                                                        <Icon name="calendar" size={20} />
                                                     </div>
-                                                    <span className="bg-amber-100 text-amber-700 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-amber-200">
-                                                        {currentData.nextTournament.date}
-                                                    </span>
+                                                    <div className="bg-rose-500 text-white text-[8px] font-black uppercase px-2 py-1 rounded-full shadow-lg animate-pulse">
+                                                        Retour Prévu
+                                                    </div>
                                                 </div>
-                                                <h3 className="text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Challenge Tour 2026</h3>
-                                                <h4 className="text-2xl font-black text-slate-900 mb-1">{currentData.nextTournament.name}</h4>
-                                                <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase">
-                                                    <Icon name="map-pin" size={12} /> {currentData.nextTournament.location}
+                                                <h3 className="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Objectif Reprise</h3>
+                                                <h4 className="text-xl font-black text-slate-900 leading-tight">{currentData.nextTournament.name}</h4>
+                                                <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase mt-2">
+                                                    <Icon name="map-pin" size={10} /> {currentData.nextTournament.location} • {currentData.nextTournament.date}
                                                 </div>
-                                                <div className="mt-10 pt-6 border-t border-slate-50 flex justify-between items-center">
-                                                    <button className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg">Stratégie</button>
-                                                </div>
+                                                <button className="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">Préparer</button>
                                             </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest px-1">Derniers Scores</h2>
+                                            {currentData.recentResults.map((res, i) => (
+                                                <div key={i} className="bg-white p-3 rounded-2xl flex items-center justify-between border border-slate-100 shadow-sm">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">{res.result}</div>
+                                                        <div>
+                                                            <p className="text-[11px] font-bold leading-none">{res.name}</p>
+                                                            <p className="text-[8px] text-slate-400 uppercase font-black mt-1">{res.date}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[10px] font-black bg-slate-50 px-2 py-1 rounded-lg border">{res.score}</span>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
+                        {/* OKR VIEW - MOBILE OPTIMIZED */}
                         {activeView === 'okrs' && (
-                            <div className="space-y-8 animate-in max-w-3xl mx-auto">
-                                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 text-center">
-                                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Plan de Montée DPWT</h2>
-                                    <p className="text-slate-500 text-sm mt-2 font-medium italic">Analyse détaillée des 5 piliers de performance d'Aymeric.</p>
+                            <div className="space-y-6 animate-in">
+                                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 text-center">
+                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Cibles & Statistiques</h2>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Road to Mallorca 2026</p>
                                 </div>
+
                                 {currentData.categories?.map((cat) => (
-                                    <div key={cat.id} className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-                                        <div className={`p-5 flex items-center gap-4 ${cat.bg} border-b border-slate-50`}>
-                                            <div className="p-2.5 rounded-xl bg-white shadow-sm">
-                                                <Icon name={cat.iconName} size={22} className={cat.color} />
+                                    <div key={cat.id} className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden">
+                                        <div className={`px-5 py-4 flex items-center gap-3 ${cat.bg}`}>
+                                            <div className="p-2 rounded-xl bg-white shadow-sm">
+                                                <Icon name={cat.iconName} size={20} className={cat.color} />
                                             </div>
-                                            <div>
-                                                <h3 className="font-black text-slate-900 text-sm uppercase tracking-wider">{cat.title}</h3>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Objectifs Saison 2026</p>
-                                            </div>
+                                            <h3 className="font-black text-slate-900 text-[12px] uppercase tracking-wider">{cat.title}</h3>
                                         </div>
-                                        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        
+                                        <div className="p-4 space-y-4">
                                             {cat.krs.map((kr, idx) => (
-                                                <div key={idx} className="space-y-2">
-                                                    <div className="flex justify-between items-start">
-                                                        <span className="text-[11px] font-bold text-slate-500 leading-tight flex items-center gap-1">
+                                                <div key={idx} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                                    <div className="flex justify-between items-start mb-3">
+                                                        <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5 uppercase">
                                                             {kr.label}
-                                                            {kr.priority && <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>}
+                                                            {kr.priority && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>}
                                                         </span>
-                                                        <span className="text-xs font-black text-slate-800 italic">{kr.current === 0 ? '--' : kr.current}{kr.unit}</span>
+                                                        <div className="flex flex-col items-end">
+                                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Progression</span>
+                                                            <span className="text-sm font-black text-emerald-600">
+                                                                {kr.current === 0 ? '0' : Math.round((kr.isLowerBetter ? (kr.target/kr.current) : (kr.current/kr.target)) * 100)}%
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
+
+                                                    <div className="h-3 w-full bg-white rounded-full overflow-hidden border border-slate-100 mb-4">
                                                         <div className={`h-full rounded-full transition-all duration-700 ${cat.color.replace('text', 'bg')}`}
                                                              style={{ width: `${kr.current === 0 ? 0 : Math.min(100, (kr.isLowerBetter ? (kr.target / kr.current) * 100 : (kr.current / kr.target) * 100))}%` }}></div>
                                                     </div>
-                                                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Cible: {kr.target}{kr.unit}</p>
+
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
+                                                            <p className="text-[8px] font-black text-slate-400 uppercase">Actuel</p>
+                                                            <p className="text-lg font-black text-slate-900">{kr.current === 0 ? '--' : kr.current}{kr.unit}</p>
+                                                        </div>
+                                                        <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 text-center">
+                                                            <p className="text-[8px] font-black text-emerald-600 uppercase">Objectif Cible</p>
+                                                            <p className="text-lg font-black text-emerald-900">{kr.target}{kr.unit}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -308,23 +301,53 @@
                                 ))}
                             </div>
                         )}
+
+                        {activeView === 'calendar' && (
+                            <div className="space-y-4 animate-in">
+                                <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center">
+                                    <h2 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter leading-none">Calendrier 2026</h2>
+                                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-200">
+                                        {(selectedTours[currentPlayer]?.[currentSeason]?.length || 0)} Prévus
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {challengeTour2026.map((tour) => {
+                                        const isSelected = selectedTours[currentPlayer]?.[currentSeason]?.includes(tour.id);
+                                        return (
+                                            <div key={tour.id} onClick={() => toggleTournament(tour.id)}
+                                                 className={`p-4 rounded-3xl cursor-pointer border-2 transition-all ${isSelected ? 'bg-emerald-900 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100'}`}>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <div className={`px-2 py-1 rounded-lg font-black text-[10px] ${isSelected ? 'bg-emerald-800 text-emerald-300' : 'bg-slate-100 text-slate-400'}`}>
+                                                        {tour.date} {tour.month}
+                                                    </div>
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'bg-emerald-400 border-emerald-400' : 'border-slate-200'}`}>
+                                                        {isSelected && <Icon name="check" size={12} className="text-white" />}
+                                                    </div>
+                                                </div>
+                                                <h4 className="font-bold text-xs leading-tight mb-1">{tour.title}</h4>
+                                                <p className={`text-[9px] font-medium uppercase opacity-60`}>{tour.loc}</p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                         
-                        {(activeView === 'calendar' || activeView === 'stats' || activeView === 'checkin') && (
-                            <div className="max-w-md mx-auto py-20 text-center animate-in">
+                        {(activeView === 'stats' || activeView === 'checkin') && (
+                            <div className="max-w-md mx-auto py-24 text-center animate-in">
                                 <Icon name="clock" size={48} className="mx-auto text-slate-200 mb-4" />
-                                <h3 className="font-black text-xl text-slate-800 uppercase tracking-tighter italic">Bientôt disponible</h3>
-                                <p className="text-slate-400 text-sm font-medium mt-2">Le module est en cours de déploiement pour la reprise à Abu Dhabi.</p>
+                                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic">Module en cours</h3>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase mt-2">Disponible après Abu Dhabi</p>
                             </div>
                         )}
                     </main>
 
-                    {/* Navbar */}
-                    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around items-center h-24 pb-8 px-6 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
+                    {/* MOBILE NAV BAR */}
+                    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around items-center h-24 pb-8 px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                         <NavItem id="dashboard" iconName="layout-dashboard" label="Dash" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
                         <NavItem id="okrs" iconName="target" label="OKR" active={activeView === 'okrs'} onClick={() => setActiveView('okrs')} />
                         <div className="relative">
-                            <div className="absolute -inset-4 bg-emerald-500/20 rounded-full blur-2xl animate-pulse"></div>
-                            <button onClick={() => setActiveView('checkin')} className="bg-[#14362d] text-white p-4 rounded-[1.5rem] -mt-14 shadow-2xl border-4 border-white active:scale-90 transition-all">
+                            <button onClick={() => setActiveView('checkin')} className="bg-[#14362d] text-white p-4 rounded-2xl -mt-12 shadow-2xl border-4 border-white active:scale-90 transition-all">
                                 <Icon name="plus-circle" size={24} />
                             </button>
                         </div>

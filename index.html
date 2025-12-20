@@ -20,6 +20,10 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Table styles for sticky column on mobile */
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .sticky-col { position: sticky; left: 0; background-color: inherit; z-index: 10; border-right: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="bg-[#f1f5f9]">
@@ -47,6 +51,24 @@
             const players = ["Aymeric Laussot", "Perrine Delacour", "Mathis Pansart", "Céline Boutier", "Victor Perez", "Matthieu Pavon", "Agathe Laisné"];
             const seasons = ["2025", "2026"];
 
+            // Données 2025 (Tableau des Cuts)
+            const stats2025Table = [
+                { name: "SDC Open (RSA)", par: 72, cutTotal: 142, cutScore: "-2", aymTotal: 141, aymScore: "-3", res: "PASSÉ", gap: "-1", r1: 72, r2: 69 },
+                { name: "Kolkata Challenge (IND)", par: 72, cutTotal: 145, cutScore: "+1", aymTotal: 142, aymScore: "-2", res: "PASSÉ", gap: "-3", r1: 72, r2: 70 },
+                { name: "Delhi Challenge (IND)", par: 72, cutTotal: 141, cutScore: "-3", aymTotal: 145, aymScore: "-1", res: "MC", gap: "+4", r1: 76, r2: 69 },
+                { name: "UAE Challenge (UAE)", par: 72, cutTotal: 141, cutScore: "-3", aymTotal: 146, aymScore: "Par", res: "MC", gap: "+5", r1: 67, r2: 79 },
+                { name: "Challenge de Catalunya", par: 72, cutTotal: 144, cutScore: "Par", aymTotal: 141, aymScore: "-3", res: "PASSÉ", gap: "-3", r1: 72, r2: 69 },
+                { name: "Danish Golf Challenge", par: 72, cutTotal: 144, cutScore: "Par", aymTotal: 138, aymScore: "-3", res: "PASSÉ", gap: "-6", r1: 67, r2: 71 },
+                { name: "Challenge de España", par: 71, cutTotal: 139, cutScore: "-3", aymTotal: 138, aymScore: "-4", res: "PASSÉ", gap: "-1", r1: 68, r2: 70 },
+                { name: "Swiss Challenge", par: 72, cutTotal: 141, cutScore: "-3", aymTotal: 142, aymScore: "+2", res: "MC", gap: "+1", r1: 72, r2: 70 },
+                { name: "Interwetten Open (AUT)", par: 71, cutTotal: 134, cutScore: "-10", aymTotal: 141, aymScore: "+3", res: "MC", gap: "+7", r1: 72, r2: 69 },
+                { name: "Blot Open de Bretagne", par: 72, cutTotal: 144, cutScore: "Par", aymTotal: 150, aymScore: "+3", res: "MC", gap: "+6", r1: 77, r2: 73 },
+                { name: "Le Vaudreuil Challenge", par: 72, cutTotal: 142, cutScore: "-2", aymTotal: 139, aymScore: "-5", res: "PASSÉ", gap: "-3", r1: 69, r2: 70 },
+                { name: "Czech Challenge", par: 71, cutTotal: 135, cutScore: "-7", aymTotal: 138, aymScore: "-4", res: "MC", gap: "+3", r1: 70, r2: 68 },
+                { name: "German Challenge", par: 72, cutTotal: 141, cutScore: "-3", aymTotal: 145, aymScore: "+1", res: "MC", gap: "+4", r1: 70, r2: 75 },
+            ];
+
+            // Calendrier Complet 2026
             const challengeTour2026 = [
                 { id: "sdc-26", date: "29-01", month: "JAN", title: "SDC Open", loc: "Afrique du Sud", r2m: 2000 },
                 { id: "cape-26", date: "05-08", month: "FÉV", title: "Cape Town Open", loc: "Afrique du Sud", r2m: 2000 },
@@ -78,6 +100,44 @@
                 { id: "final-26", date: "29-01", month: "NOV", title: "Rolex Grand Final", loc: "Espagne", r2m: 2000, major: true }
             ];
 
+            const createOKRStructure = (isSeason2025 = false) => [
+                { id: 1, title: "1. Performance en Tournoi", iconName: "trophy", color: "text-amber-600", bg: "bg-amber-100",
+                    krs: [
+                        { label: "Victoires", target: 1, current: 0, unit: "" },
+                        { label: "Top 10", target: 5, current: isSeason2025 ? 1 : 0, unit: "", priority: true },
+                        { label: "Cuts Passés", target: 70, current: isSeason2025 ? 46 : 0, unit: "%", priority: true }
+                    ]
+                },
+                { id: 2, title: "2. Driving & Précision", iconName: "wind", color: "text-blue-600", bg: "bg-blue-100",
+                    krs: [
+                        { label: "Fairways touchés", target: 68, current: isSeason2025 ? 62 : 0, unit: "%", priority: true },
+                        { label: "Vitesse de balle", target: 180, current: 0, unit: " mph" },
+                        { label: "Moyenne Distance", target: 295, current: 0, unit: "y" }
+                    ]
+                },
+                { id: 3, title: "3. Scoring & Petit Jeu", iconName: "target", color: "text-emerald-600", bg: "bg-emerald-100",
+                    krs: [
+                        { label: "Putts / Tour", target: 28.5, current: isSeason2025 ? 29.2 : 0, unit: "", priority: true, isLowerBetter: true },
+                        { label: "Putts par GIR", target: 1.75, current: 0, unit: "", isLowerBetter: true },
+                        { label: "Scrambling", target: 65, current: 0, unit: "%" }
+                    ]
+                },
+                { id: 4, title: "4. Physique & Récupération", iconName: "activity", color: "text-rose-600", bg: "bg-rose-100",
+                    krs: [
+                        { label: "HRV Moyen", target: 75, current: isSeason2025 ? 68 : 0, unit: "ms", priority: true },
+                        { label: "Mobilité (Yoga/Kiné)", target: 10, current: 0, unit: "/m" },
+                        { label: "Sommeil (> 8h/n)" , target: 100, current: 0, unit: "%" }
+                    ]
+                },
+                { id: 5, title: "5. Mental & Routines", iconName: "brain", color: "text-purple-600", bg: "bg-purple-100",
+                    krs: [
+                        { label: "Routine Pre-shot", target: 100, current: 0, unit: "%" },
+                        { label: "Méditation & Respiration", target: 6, current: 0, unit: "j/7" },
+                        { label: "Focus Post-Round", target: 100, current: 0, unit: "%" }
+                    ]
+                }
+            ];
+
             const okrData = {
                 "Aymeric Laussot": {
                     "2026": {
@@ -88,43 +148,17 @@
                             { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
                         ],
                         staffNote: "Rééducation en cours. Focus sur le pilier 4 (Physique) et 5 (Mental) pendant l'indisponibilité.",
-                        categories: [
-                            { id: 1, title: "1. Performance en Tournoi", iconName: "trophy", color: "text-amber-600", bg: "bg-amber-100",
-                                krs: [
-                                    { label: "Victoires", target: 1, current: 0, unit: "" },
-                                    { label: "Top 10", target: 5, current: 0, unit: "", priority: true },
-                                    { label: "Cuts Passés", target: 70, current: 0, unit: "%", priority: true }
-                                ]
-                            },
-                            { id: 2, title: "2. Driving & Précision", iconName: "wind", color: "text-blue-600", bg: "bg-blue-100",
-                                krs: [
-                                    { label: "Fairways touchés", target: 68, current: 0, unit: "%", priority: true },
-                                    { label: "Vitesse de balle", target: 180, current: 0, unit: " mph" },
-                                    { label: "Moyenne Distance", target: 295, current: 0, unit: "y" }
-                                ]
-                            },
-                            { id: 3, title: "3. Scoring & Petit Jeu", iconName: "target", color: "text-emerald-600", bg: "bg-emerald-100",
-                                krs: [
-                                    { label: "Putts / Tour", target: 28.5, current: 0, unit: "", priority: true, isLowerBetter: true },
-                                    { label: "Putts par GIR", target: 1.75, current: 0, unit: "", isLowerBetter: true },
-                                    { label: "Scrambling", target: 65, current: 0, unit: "%" }
-                                ]
-                            },
-                            { id: 4, title: "4. Physique & Récupération", iconName: "activity", color: "text-rose-600", bg: "bg-rose-100",
-                                krs: [
-                                    { label: "HRV Moyen", target: 75, current: 62, unit: "ms", priority: true },
-                                    { label: "Mobilité (Yoga/Kiné)", target: 10, current: 0, unit: "/m" },
-                                    { label: "Sommeil (> 8h/n)" , target: 100, current: 0, unit: "%" }
-                                ]
-                            },
-                            { id: 5, title: "5. Mental & Routines", iconName: "brain", color: "text-purple-600", bg: "bg-purple-100",
-                                krs: [
-                                    { label: "Routine Pre-shot", target: 100, current: 0, unit: "%" },
-                                    { label: "Méditation & Respiration", target: 6, current: 0, unit: "j/7" },
-                                    { label: "Focus Post-Round", target: 100, current: 0, unit: "%" }
-                                ]
-                            }
-                        ]
+                        categories: createOKRStructure(false)
+                    },
+                    "2025": {
+                        status: "Terminé",
+                        nextTournament: { name: "Saison Clôturée", location: "N/A", date: "N/A" },
+                        recentResults: [
+                            { name: "German Challenge", result: "CUT", score: "85T (70-75)", date: "20 Juil 2025" },
+                            { name: "Czech Challenge", result: "CUT", score: "98T (70-68)", date: "13 Juil 2025" }
+                        ],
+                        staffNote: "Archive saison 2025. Analyse des écarts sur les cuts disponible dans l'onglet dédié.",
+                        categories: createOKRStructure(true)
                     }
                 }
             };
@@ -151,7 +185,7 @@
 
             return (
                 <div className="min-h-screen pb-32">
-                    {/* Header Fixed */}
+                    {/* Header */}
                     <header className="bg-[#14362d] text-white p-4 sticky top-0 z-50 shadow-xl">
                         <div className="max-w-6xl mx-auto flex items-center justify-between">
                             <div className="flex flex-col min-w-[100px]">
@@ -161,22 +195,10 @@
                                 </select>
                             </div>
 
-                            <div className="flex-1 text-center hidden sm:block">
-                                <h1 className="font-black text-[10px] sm:text-xs uppercase italic tracking-[0.2em] opacity-40 leading-none">Objectives & Key Results</h1>
-                            </div>
-
                             <div className="flex flex-col items-end gap-1.5">
-                                <div className="flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/5">
+                                <div className="flex items-center gap-1 bg-black/20 p-1 rounded-xl">
                                     {seasons.map(s => (
-                                        <button 
-                                            key={s}
-                                            onClick={() => setCurrentSeason(s)}
-                                            className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${
-                                                currentSeason === s 
-                                                ? 'bg-emerald-500 text-white shadow-lg' 
-                                                : 'text-emerald-100/40 hover:text-white hover:bg-white/5'
-                                            }`}
-                                        >
+                                        <button key={s} onClick={() => setCurrentSeason(s)} className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${currentSeason === s ? 'bg-emerald-500 text-white shadow-lg' : 'text-emerald-100/40'}`}>
                                             {s}
                                         </button>
                                     ))}
@@ -195,7 +217,7 @@
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                     <div className="lg:col-span-7 space-y-6">
                                         <div className="flex items-center gap-3">
-                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest">Priorités</h2>
+                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest">Priorités {currentSeason}</h2>
                                             <div className="flex-1 h-px bg-slate-200"></div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
@@ -215,7 +237,7 @@
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="bg-[#14362d] p-5 rounded-3xl text-white shadow-lg border border-emerald-900/20">
+                                        <div className="bg-[#14362d] p-5 rounded-3xl text-white shadow-lg">
                                             <div className="flex items-center gap-2 mb-2 text-emerald-300">
                                                 <Icon name="alert-circle" size={14} />
                                                 <span className="text-[10px] font-black uppercase tracking-widest">Note du Staff</span>
@@ -225,27 +247,25 @@
                                     </div>
 
                                     <div className="lg:col-span-5 space-y-6">
-                                        <div className="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-200 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-[4rem] -z-0"></div>
-                                            <div className="relative z-10">
-                                                <div className="flex justify-between items-start mb-6">
-                                                    <div className="bg-emerald-600 p-3 rounded-2xl text-white shadow-lg">
-                                                        <Icon name="calendar" size={20} />
+                                        {currentSeason === '2026' && (
+                                            <div className="bg-white rounded-[2.5rem] p-6 shadow-xl border border-slate-200 relative overflow-hidden group">
+                                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-[4rem] -z-0"></div>
+                                                <div className="relative z-10">
+                                                    <div className="flex justify-between items-start mb-6">
+                                                        <div className="bg-emerald-600 p-3 rounded-2xl text-white shadow-lg"><Icon name="calendar" size={20} /></div>
+                                                        <div className="bg-rose-500 text-white text-[8px] font-black uppercase px-2 py-1 rounded-full animate-pulse">Retour Prévu</div>
                                                     </div>
-                                                    <div className="bg-rose-500 text-white text-[8px] font-black uppercase px-2 py-1 rounded-full shadow-lg animate-pulse">
-                                                        Retour Prévu
+                                                    <h3 className="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Objectif Reprise</h3>
+                                                    <h4 className="text-xl font-black text-slate-900 leading-tight">{currentData.nextTournament.name}</h4>
+                                                    <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase mt-2">
+                                                        <Icon name="map-pin" size={10} /> {currentData.nextTournament.location} • {currentData.nextTournament.date}
                                                     </div>
+                                                    <button className="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase shadow-xl">Préparer</button>
                                                 </div>
-                                                <h3 className="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Objectif Reprise</h3>
-                                                <h4 className="text-xl font-black text-slate-900 leading-tight">{currentData.nextTournament.name}</h4>
-                                                <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase mt-2">
-                                                    <Icon name="map-pin" size={10} /> {currentData.nextTournament.location} • {currentData.nextTournament.date}
-                                                </div>
-                                                <button className="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-transform">Préparer</button>
                                             </div>
-                                        </div>
+                                        )}
                                         <div className="space-y-3">
-                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest px-1">Derniers Scores</h2>
+                                            <h2 className="text-xs font-black uppercase text-slate-500 tracking-widest px-1">Scores Récents</h2>
                                             {currentData.recentResults.map((res, i) => (
                                                 <div key={i} className="bg-white p-3 rounded-2xl flex items-center justify-between border border-slate-100 shadow-sm">
                                                     <div className="flex items-center gap-3">
@@ -275,32 +295,22 @@
                                 {currentData.categories?.map((cat) => (
                                     <div key={cat.id} className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden">
                                         <div className={`px-5 py-4 flex items-center gap-3 ${cat.bg}`}>
-                                            <div className="p-2 rounded-xl bg-white shadow-sm">
-                                                <Icon name={cat.iconName} size={20} className={cat.color} />
-                                            </div>
+                                            <div className="p-2 rounded-xl bg-white shadow-sm"><Icon name={cat.iconName} size={20} className={cat.color} /></div>
                                             <h3 className="font-black text-slate-900 text-[12px] uppercase tracking-wider">{cat.title}</h3>
                                         </div>
-                                        
                                         <div className="p-4 space-y-4">
                                             {cat.krs.map((kr, idx) => (
                                                 <div key={idx} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                                                     <div className="flex justify-between items-start mb-3">
                                                         <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5 uppercase leading-none">
-                                                            {kr.label}
-                                                            {kr.priority && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>}
+                                                            {kr.label} {kr.priority && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>}
                                                         </span>
-                                                        <div className="flex flex-col items-end">
-                                                            <span className="text-sm font-black text-emerald-600">
-                                                                {kr.current === 0 ? '0' : Math.round((kr.isLowerBetter ? (kr.target/kr.current) : (kr.current/kr.target)) * 100)}%
-                                                            </span>
-                                                        </div>
+                                                        <span className="text-sm font-black text-emerald-600">{kr.current === 0 ? '0' : Math.round((kr.isLowerBetter ? (kr.target/kr.current) : (kr.current/kr.target)) * 100)}%</span>
                                                     </div>
-
                                                     <div className="h-3 w-full bg-white rounded-full overflow-hidden border border-slate-100 mb-4">
                                                         <div className={`h-full rounded-full transition-all duration-700 ${cat.color.replace('text', 'bg')}`}
                                                              style={{ width: `${kr.current === 0 ? 0 : Math.min(100, (kr.isLowerBetter ? (kr.target / kr.current) * 100 : (kr.current / kr.target) * 100))}%` }}></div>
                                                     </div>
-
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
                                                             <p className="text-[8px] font-black text-slate-400 uppercase leading-none mb-1">Actuel</p>
@@ -308,7 +318,7 @@
                                                         </div>
                                                         <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 text-center">
                                                             <p className="text-[8px] font-black text-emerald-600 uppercase leading-none mb-1">Cible</p>
-                                                            <p className="text-lg font-black text-emerald-900 leading-none">{kr.target}{kr.unit}</p>
+                                                            <p className="text-lg font-black text-emerald-900">{kr.target}{kr.unit}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -319,57 +329,92 @@
                             </div>
                         )}
 
+                        {/* CUTS VIEW */}
+                        {activeView === 'cuts' && (
+                            <div className="space-y-6 animate-in">
+                                {currentSeason === '2025' ? (
+                                    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+                                        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic leading-none text-center">Rapport des Cuts 2025</h2>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase mt-2 tracking-[0.2em] text-center mb-6">Archive Challenge Tour</p>
+                                        <div className="table-container rounded-2xl border border-slate-100 overflow-hidden">
+                                            <table className="w-full text-left text-[11px] border-collapse">
+                                                <thead>
+                                                    <tr className="bg-slate-900 text-white uppercase font-black tracking-widest text-[9px]">
+                                                        <th className="p-3 sticky-col bg-slate-900 whitespace-nowrap">Tournoi</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">Cut (36h)</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">Aym (Tot)</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">Rés.</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">Écart</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">R1</th>
+                                                        <th className="p-3 whitespace-nowrap text-center">R2</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 bg-white">
+                                                    {stats2025Table.map((tour, idx) => (
+                                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                                            <td className="p-3 sticky-col font-bold text-slate-700 whitespace-nowrap">{tour.name}</td>
+                                                            <td className="p-3 text-center text-slate-400 font-bold">{tour.cutTotal} ({tour.cutScore})</td>
+                                                            <td className="p-3 text-center text-slate-900 font-black">{tour.aymTotal} ({tour.aymScore})</td>
+                                                            <td className="p-3 text-center"><span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${tour.res === 'PASSÉ' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{tour.res}</span></td>
+                                                            <td className={`p-3 text-center font-black ${tour.gap.includes('-') ? 'text-emerald-600' : 'text-rose-600'}`}>{tour.gap}</td>
+                                                            <td className="p-3 text-center text-slate-500">{tour.r1}</td>
+                                                            <td className="p-3 text-center text-slate-500">{tour.r2}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="max-w-md mx-auto py-24 text-center bg-white rounded-[2rem] border border-slate-100 shadow-sm px-6">
+                                        <Icon name="bar-chart-3" size={48} className="mx-auto text-emerald-100 mb-4" />
+                                        <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic leading-none">Cuts 2026</h3>
+                                        <p className="text-slate-400 text-[10px] font-bold uppercase mt-3 tracking-widest leading-relaxed">Les données seront enregistrées à partir du tournoi d'Abu Dhabi.</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {activeView === 'calendar' && (
                             <div className="space-y-4 animate-in">
                                 <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center">
                                     <h2 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter leading-none">Calendrier {currentSeason}</h2>
-                                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-200">
-                                        {(selectedTours[currentPlayer]?.[currentSeason]?.length || 0)} Prévus
-                                    </span>
+                                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{(selectedTours[currentPlayer]?.[currentSeason]?.length || 0)} Prévus</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {challengeTour2026.map((tour) => {
+                                    {currentSeason === '2026' ? challengeTour2026.map((tour) => {
                                         const isSelected = selectedTours[currentPlayer]?.[currentSeason]?.includes(tour.id);
                                         return (
-                                            <div key={tour.id} onClick={() => toggleTournament(tour.id)}
-                                                 className={`p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 ${isSelected ? 'bg-emerald-900 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100'}`}>
+                                            <div key={tour.id} onClick={() => toggleTournament(tour.id)} className={`p-4 rounded-3xl cursor-pointer border-2 transition-all ${isSelected ? 'bg-emerald-900 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100'}`}>
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <div className={`px-2 py-1 rounded-lg font-black text-[10px] ${isSelected ? 'bg-emerald-800 text-emerald-300' : 'bg-slate-100 text-slate-400'}`}>
-                                                        {tour.date} {tour.month}
-                                                    </div>
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'bg-emerald-400 border-emerald-400' : 'border-slate-200'}`}>
-                                                        {isSelected && <Icon name="check" size={12} className="text-white" />}
-                                                    </div>
+                                                    <div className={`px-2 py-1 rounded-lg font-black text-[10px] ${isSelected ? 'bg-emerald-800 text-emerald-300' : 'bg-slate-100 text-slate-400'}`}>{tour.date} {tour.month}</div>
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'bg-emerald-400 border-emerald-400' : 'border-slate-200'}`}>{isSelected && <Icon name="check" size={12} className="text-white" />}</div>
                                                 </div>
                                                 <h4 className="font-bold text-xs leading-tight mb-1">{tour.title}</h4>
-                                                <p className={`text-[9px] font-medium uppercase opacity-60 tracking-tight`}>{tour.loc}</p>
+                                                <p className="text-[9px] font-medium uppercase opacity-60">{tour.loc}</p>
                                             </div>
                                         );
-                                    })}
+                                    }) : <p className="text-center py-20 text-slate-400 italic text-xs w-full col-span-full">Calendrier 2025 archivé.</p>}
                                 </div>
                             </div>
                         )}
                         
-                        {(activeView === 'stats' || activeView === 'checkin') && (
+                        {activeView === 'checkin' && (
                             <div className="max-w-md mx-auto py-24 text-center animate-in">
                                 <Icon name="clock" size={48} className="mx-auto text-slate-200 mb-4" />
-                                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic leading-none">Module en cours</h3>
-                                <p className="text-slate-400 text-[10px] font-bold uppercase mt-2 tracking-widest">Disponible après Abu Dhabi</p>
+                                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic leading-none">Module Check-in</h3>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase mt-2 tracking-widest">Ouverture le 15 Avril 2026</p>
                             </div>
                         )}
                     </main>
 
-                    {/* MOBILE NAV BAR */}
+                    {/* Nav Bar */}
                     <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex justify-around items-center h-24 pb-8 px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                         <NavItem id="dashboard" iconName="layout-dashboard" label="Dash" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
                         <NavItem id="okrs" iconName="target" label="OKR" active={activeView === 'okrs'} onClick={() => setActiveView('okrs')} />
-                        <div className="relative">
-                            <button onClick={() => setActiveView('checkin')} className="bg-[#14362d] text-white p-4 rounded-2xl -mt-12 shadow-2xl border-4 border-white active:scale-90 transition-all">
-                                <Icon name="plus-circle" size={24} />
-                            </button>
-                        </div>
+                        <div className="relative"><button onClick={() => setActiveView('checkin')} className="bg-[#14362d] text-white p-4 rounded-2xl -mt-12 shadow-2xl border-4 border-white active:scale-90 transition-all"><Icon name="plus-circle" size={24} /></button></div>
                         <NavItem id="calendar" iconName="calendar" label="Cal" active={activeView === 'calendar'} onClick={() => setActiveView('calendar')} />
-                        <NavItem id="stats" iconName="bar-chart-3" label="Stats" active={activeView === 'stats'} onClick={() => setActiveView('stats')} />
+                        <NavItem id="cuts" iconName="bar-chart-3" label="Cuts" active={activeView === 'cuts'} onClick={() => setActiveView('cuts')} />
                     </nav>
                 </div>
             );

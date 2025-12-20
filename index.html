@@ -99,7 +99,7 @@
                             { id: 2, title: "2. Driving & Précision", iconName: "wind", color: "text-blue-600", bg: "bg-blue-100",
                                 krs: [
                                     { label: "Fairways touchés", target: 68, current: 0, unit: "%", priority: true },
-                                    { label: "Vitesse de balle", target: 172, current: 0, unit: " mph" },
+                                    { label: "Vitesse de balle", target: 180, current: 0, unit: " mph" },
                                     { label: "Moyenne Distance", target: 295, current: 0, unit: "y" }
                                 ]
                             },
@@ -113,14 +113,14 @@
                             { id: 4, title: "4. Physique & Récupération", iconName: "activity", color: "text-rose-600", bg: "bg-rose-100",
                                 krs: [
                                     { label: "HRV Moyen", target: 75, current: 62, unit: "ms", priority: true },
-                                    { label: "Mobilité (Yoga/Kiné)", target: 5, current: 0, unit: "/m" },
+                                    { label: "Mobilité (Yoga/Kiné)", target: 10, current: 0, unit: "/m" },
                                     { label: "Sommeil (> 8h/n)" , target: 100, current: 0, unit: "%" }
                                 ]
                             },
                             { id: 5, title: "5. Mental & Routines", iconName: "brain", color: "text-purple-600", bg: "bg-purple-100",
                                 krs: [
                                     { label: "Routine Pre-shot", target: 100, current: 0, unit: "%" },
-                                    { label: "Méditation", target: 5, current: 0, unit: "j/7" },
+                                    { label: "Méditation & Respiration", target: 6, current: 0, unit: "j/7" },
                                     { label: "Focus Post-Round", target: 100, current: 0, unit: "%" }
                                 ]
                             }
@@ -154,18 +154,36 @@
                     {/* Header Fixed */}
                     <header className="bg-[#14362d] text-white p-4 sticky top-0 z-50 shadow-xl">
                         <div className="max-w-6xl mx-auto flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-[8px] font-black uppercase opacity-60 tracking-widest">Joueur</span>
+                            <div className="flex flex-col min-w-[100px]">
+                                <span className="text-[8px] font-black uppercase opacity-60 tracking-widest leading-none mb-1">Joueur</span>
                                 <select value={currentPlayer} onChange={(e) => setCurrentPlayer(e.target.value)} className="bg-transparent border-none text-[12px] font-bold uppercase outline-none p-0 cursor-pointer">
                                     {players.map(p => <option key={p} value={p} className="text-black">{p}</option>)}
                                 </select>
                             </div>
-                            <h1 className="font-black text-sm uppercase italic tracking-tighter text-center leading-none px-2">Objectives & Key Results</h1>
-                            <div className="text-right">
-                                <select value={currentSeason} onChange={(e) => setCurrentSeason(e.target.value)} className="bg-transparent border-none text-[10px] font-bold uppercase outline-none p-0 text-right cursor-pointer">
-                                    {seasons.map(s => <option key={s} value={s} className="text-black">S{s}</option>)}
-                                </select>
-                                <div className="text-[8px] font-black uppercase text-emerald-400 mt-1">{currentSeason === '2026' ? 'Actif' : 'Archivé'}</div>
+
+                            <div className="flex-1 text-center hidden sm:block">
+                                <h1 className="font-black text-[10px] sm:text-xs uppercase italic tracking-[0.2em] opacity-40 leading-none">Objectives & Key Results</h1>
+                            </div>
+
+                            <div className="flex flex-col items-end gap-1.5">
+                                <div className="flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/5">
+                                    {seasons.map(s => (
+                                        <button 
+                                            key={s}
+                                            onClick={() => setCurrentSeason(s)}
+                                            className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${
+                                                currentSeason === s 
+                                                ? 'bg-emerald-500 text-white shadow-lg' 
+                                                : 'text-emerald-100/40 hover:text-white hover:bg-white/5'
+                                            }`}
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                                <span className={`text-[8px] font-black uppercase tracking-widest ${currentSeason === '2026' ? 'text-emerald-400' : 'text-slate-400 opacity-60'}`}>
+                                    {currentSeason === '2026' ? 'Actif' : 'Archivé'}
+                                </span>
                             </div>
                         </div>
                     </header>
@@ -187,20 +205,20 @@
                                                         <div className={`p-1.5 rounded-lg ${kr.catColor.replace('text', 'bg').replace('600', '100')}`}>
                                                             <Icon name={kr.catIcon} size={14} className={kr.catColor} />
                                                         </div>
-                                                        <span className="text-[8px] font-black bg-slate-100 px-1.5 py-0.5 rounded uppercase">Prio</span>
+                                                        <span className="text-[8px] font-black bg-slate-100 px-1.5 py-0.5 rounded uppercase text-slate-400">Prio</span>
                                                     </div>
                                                     <p className="text-[10px] font-bold text-slate-800 truncate mb-1">{kr.label}</p>
                                                     <div className="flex items-baseline gap-1">
-                                                        <span className="text-xl font-black">{kr.current === 0 ? '--' : kr.current}{kr.unit}</span>
+                                                        <span className="text-xl font-black text-slate-900">{kr.current === 0 ? '--' : kr.current}{kr.unit}</span>
                                                         <span className="text-[10px] text-slate-400 font-bold uppercase">/ {kr.target}{kr.unit}</span>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                         <div className="bg-[#14362d] p-5 rounded-3xl text-white shadow-lg border border-emerald-900/20">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Icon name="alert-circle" size={14} className="text-emerald-400" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-300">Note du Staff</span>
+                                            <div className="flex items-center gap-2 mb-2 text-emerald-300">
+                                                <Icon name="alert-circle" size={14} />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Note du Staff</span>
                                             </div>
                                             <p className="text-xs italic font-medium opacity-90 leading-relaxed">"{currentData.staffNote}"</p>
                                         </div>
@@ -223,7 +241,7 @@
                                                 <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase mt-2">
                                                     <Icon name="map-pin" size={10} /> {currentData.nextTournament.location} • {currentData.nextTournament.date}
                                                 </div>
-                                                <button className="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">Préparer</button>
+                                                <button className="mt-6 w-full bg-slate-900 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-transform">Préparer</button>
                                             </div>
                                         </div>
                                         <div className="space-y-3">
@@ -233,11 +251,11 @@
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">{res.result}</div>
                                                         <div>
-                                                            <p className="text-[11px] font-bold leading-none">{res.name}</p>
+                                                            <p className="text-[11px] font-bold leading-none text-slate-800">{res.name}</p>
                                                             <p className="text-[8px] text-slate-400 uppercase font-black mt-1">{res.date}</p>
                                                         </div>
                                                     </div>
-                                                    <span className="text-[10px] font-black bg-slate-50 px-2 py-1 rounded-lg border">{res.score}</span>
+                                                    <span className="text-[10px] font-black bg-slate-50 px-2 py-1 rounded-lg border text-slate-600">{res.score}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -246,12 +264,12 @@
                             </div>
                         )}
 
-                        {/* OKR VIEW - MOBILE OPTIMIZED */}
+                        {/* OKR VIEW */}
                         {activeView === 'okrs' && (
                             <div className="space-y-6 animate-in">
                                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 text-center">
-                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Cibles & Statistiques</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-widest">Road to Mallorca 2026</p>
+                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic leading-none">Cibles & Statistiques</h2>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-2 tracking-[0.2em]">Road to Mallorca {currentSeason}</p>
                                 </div>
 
                                 {currentData.categories?.map((cat) => (
@@ -265,14 +283,13 @@
                                         
                                         <div className="p-4 space-y-4">
                                             {cat.krs.map((kr, idx) => (
-                                                <div key={idx} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                                <div key={idx} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                                                     <div className="flex justify-between items-start mb-3">
-                                                        <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5 uppercase">
+                                                        <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5 uppercase leading-none">
                                                             {kr.label}
                                                             {kr.priority && <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>}
                                                         </span>
                                                         <div className="flex flex-col items-end">
-                                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Progression</span>
                                                             <span className="text-sm font-black text-emerald-600">
                                                                 {kr.current === 0 ? '0' : Math.round((kr.isLowerBetter ? (kr.target/kr.current) : (kr.current/kr.target)) * 100)}%
                                                             </span>
@@ -286,12 +303,12 @@
 
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <div className="bg-white p-2 rounded-xl border border-slate-100 text-center">
-                                                            <p className="text-[8px] font-black text-slate-400 uppercase">Actuel</p>
-                                                            <p className="text-lg font-black text-slate-900">{kr.current === 0 ? '--' : kr.current}{kr.unit}</p>
+                                                            <p className="text-[8px] font-black text-slate-400 uppercase leading-none mb-1">Actuel</p>
+                                                            <p className="text-lg font-black text-slate-900 leading-none">{kr.current === 0 ? '--' : kr.current}{kr.unit}</p>
                                                         </div>
                                                         <div className="bg-emerald-50 p-2 rounded-xl border border-emerald-100 text-center">
-                                                            <p className="text-[8px] font-black text-emerald-600 uppercase">Objectif Cible</p>
-                                                            <p className="text-lg font-black text-emerald-900">{kr.target}{kr.unit}</p>
+                                                            <p className="text-[8px] font-black text-emerald-600 uppercase leading-none mb-1">Cible</p>
+                                                            <p className="text-lg font-black text-emerald-900 leading-none">{kr.target}{kr.unit}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -305,7 +322,7 @@
                         {activeView === 'calendar' && (
                             <div className="space-y-4 animate-in">
                                 <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex justify-between items-center">
-                                    <h2 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter leading-none">Calendrier 2026</h2>
+                                    <h2 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter leading-none">Calendrier {currentSeason}</h2>
                                     <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-200">
                                         {(selectedTours[currentPlayer]?.[currentSeason]?.length || 0)} Prévus
                                     </span>
@@ -315,7 +332,7 @@
                                         const isSelected = selectedTours[currentPlayer]?.[currentSeason]?.includes(tour.id);
                                         return (
                                             <div key={tour.id} onClick={() => toggleTournament(tour.id)}
-                                                 className={`p-4 rounded-3xl cursor-pointer border-2 transition-all ${isSelected ? 'bg-emerald-900 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100'}`}>
+                                                 className={`p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 ${isSelected ? 'bg-emerald-900 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100'}`}>
                                                 <div className="flex justify-between items-center mb-2">
                                                     <div className={`px-2 py-1 rounded-lg font-black text-[10px] ${isSelected ? 'bg-emerald-800 text-emerald-300' : 'bg-slate-100 text-slate-400'}`}>
                                                         {tour.date} {tour.month}
@@ -325,7 +342,7 @@
                                                     </div>
                                                 </div>
                                                 <h4 className="font-bold text-xs leading-tight mb-1">{tour.title}</h4>
-                                                <p className={`text-[9px] font-medium uppercase opacity-60`}>{tour.loc}</p>
+                                                <p className={`text-[9px] font-medium uppercase opacity-60 tracking-tight`}>{tour.loc}</p>
                                             </div>
                                         );
                                     })}
@@ -336,14 +353,14 @@
                         {(activeView === 'stats' || activeView === 'checkin') && (
                             <div className="max-w-md mx-auto py-24 text-center animate-in">
                                 <Icon name="clock" size={48} className="mx-auto text-slate-200 mb-4" />
-                                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic">Module en cours</h3>
-                                <p className="text-slate-400 text-[10px] font-bold uppercase mt-2">Disponible après Abu Dhabi</p>
+                                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter italic leading-none">Module en cours</h3>
+                                <p className="text-slate-400 text-[10px] font-bold uppercase mt-2 tracking-widest">Disponible après Abu Dhabi</p>
                             </div>
                         )}
                     </main>
 
                     {/* MOBILE NAV BAR */}
-                    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 flex justify-around items-center h-24 pb-8 px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 flex justify-around items-center h-24 pb-8 px-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                         <NavItem id="dashboard" iconName="layout-dashboard" label="Dash" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
                         <NavItem id="okrs" iconName="target" label="OKR" active={activeView === 'okrs'} onClick={() => setActiveView('okrs')} />
                         <div className="relative">
